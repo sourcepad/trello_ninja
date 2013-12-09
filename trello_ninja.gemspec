@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = TrelloNinja::VERSION
   spec.authors       = ["Migz Suelto"]
   spec.email         = ["michaels@sourcepad.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = "Trello API Ruby Wrapper"
+  spec.summary       = "trello api"
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -20,4 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "pry"
+  spec.add_runtime_dependency "json"
+  spec.add_runtime_dependency "representable"
 end
