@@ -81,6 +81,6 @@ module TrelloNinja
           action['message'] = message
           return action
         end
-		end
-	end
+    end
+  end
 end
