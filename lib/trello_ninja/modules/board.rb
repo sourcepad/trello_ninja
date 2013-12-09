@@ -1,27 +1,27 @@
 module TrelloNinja
 	module Modules
 		module Board
-			def get_board_cards(board_id)
-				JSON(connection["/boards/#{board_id}/cards?key=#{key['client_id']}&token=#{token}"].get)
-			end
-
-      def get_board_lists(board_id)
-      	JSON(connection["/boards/#{board_id}/lists?key=#{key['client_id']}&token=#{token}"].get)
+      def get_board_cards(board_id)
+        JSON(connection["/boards/#{board_id}/cards?key=#{key['client_id']}&token=#{token}"].get)
       end
 
-			def get_board_actions(board_id)
-				actions = JSON(connection["/boards/#{board_id}/actions?limit=10&key=#{key['client_id']}&token=#{token}"].get)
-				cards = get_board_cards(board_id)
-				new_actions = []
+      def get_board_lists(board_id)
+        JSON(connection["/boards/#{board_id}/lists?key=#{key['client_id']}&token=#{token}"].get)
+      end
+
+      def get_board_actions(board_id)
+        actions = JSON(connection["/boards/#{board_id}/actions?limit=10&key=#{key['client_id']}&token=#{token}"].get)
+        cards = get_board_cards(board_id)
+        new_actions = []
         actions.each do |action|
           new_actions << action_message(cards, action)
         end
         return new_actions				
-			end
+      end
 
-			private
+      private
 
-				def action_message(cards, action)
+        def action_message(cards, action)
           data = action['data']
           if data && data['card']
           	card_id = data['card']['id']
@@ -56,7 +56,7 @@ module TrelloNinja
           # Comment on card
           elsif action['type'] == "commentCard"
             message = "#{author_fullname} commented on <a href=#{card_url}>#{card_name}</a>: \"#{data["text"]}\""
-				
+
           # Add a member to a card
           elsif action["type"] == "addMemberToCard"
             if action["memberCreator"]["id"] == action["member"]["id"]
@@ -77,10 +77,10 @@ module TrelloNinja
           elsif action["type"] == "updateCheckItemStateOnCard" && data["checkItem"]["state"] == "complete"
             message = "#{author_fullname} completed #{data["checkItem"]["name"]} on <a href=#{card_url}>#{card_name}</a>"            
           end
-				  
-				  action['message'] = message
-				  return action
-				end
+          
+          action['message'] = message
+          return action
+        end
 		end
 	end
 end
