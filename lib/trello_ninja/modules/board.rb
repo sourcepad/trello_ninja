@@ -45,7 +45,8 @@ module TrelloNinja
 
           # Move card from old list to new list
           elsif action['type'] == "updateCard" && data["listAfter"] && data["listBefore"]
-            message = "#{author_fullname} moved <a href='#{card_url}' target='_blank'>#{card_name}</a> from #{data["listBefore"]["name"]} to #{data["listAfter"]["name"]}."
+            url = card_url.present? ? "<a href='#{card_url}' target='_blank'>#{card_name}</a>" : "#{card_name}"
+            message = "#{author_fullname} moved #{url} from #{data["listBefore"]["name"]} to #{data["listAfter"]["name"]}."
 
           # Update the name of a card
           elsif action["type"] == "updateCard" && data["old"] && data["old"]["name"]
@@ -58,6 +59,9 @@ module TrelloNinja
             elsif data["old"]["closed"] == false
               message = "#{author_fullname} archived #{card_name}"
             end
+
+          elsif action["type"] == "updateCard" && data["old"] && data["old"]["desc"]
+            message = "#{author_fullname} updated the description of <a href='#{card_url}' target='_blank'>#{card_name}</a>"            
 
           # Comment on card
           elsif action['type'] == "commentCard"
@@ -80,8 +84,12 @@ module TrelloNinja
             end
 
           elsif action["type"] == "addMemberToBoard"
-            # added_member_object = members.detect { |member| member['id'] == data['idMemberAdded']}
-            # message = "#{author_fullname} added #{added_member_object['fullName']} to #{data['board']['name']}"
+            begin
+              added_member_object = members.detect { |member| member['id'] == data['idMemberAdded']}
+              message = "#{author_fullname} added #{added_member_object.present? ? added_member_object['fullName'] : 'a member'} to #{data['board']['name']}"
+            rescue
+              binding.pry
+            end
 
           # Complete an item in the checklist of a card
           elsif action["type"] == "updateCheckItemStateOnCard" && data["checkItem"]["state"] == "complete"
