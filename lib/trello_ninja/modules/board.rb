@@ -14,7 +14,7 @@ module TrelloNinja
       end
 
       def get_board_actions(board_id)
-        actions = JSON(connection["/boards/#{board_id}/actions?limit=10&key=#{key['client_id']}&token=#{token}"].get)
+        actions = JSON(connection["/boards/#{board_id}/actions?key=#{key['client_id']}&token=#{token}"].get)
         cards = get_board_cards(board_id)
         members = get_board_members(board_id)
         new_actions = []
