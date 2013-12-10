@@ -1,6 +1,7 @@
 module TrelloNinja
 	module Modules
 		module Board
+
       def get_board_cards(board_id)
         JSON(connection["/boards/#{board_id}/cards?key=#{key['client_id']}&token=#{token}"].get)
       end
@@ -14,12 +15,13 @@ module TrelloNinja
       end
 
       def get_board_actions(board_id)
+        board_info = JSON(connection["/boards/#{board_id}?key=#{key['client_id']}&token=#{token}"].get)
         actions = JSON(connection["/boards/#{board_id}/actions?key=#{key['client_id']}&token=#{token}"].get)
         cards = get_board_cards(board_id)
         members = get_board_members(board_id)
         new_actions = []
         actions.each do |action|
-          new_actions << action_message(members, cards, action)
+          new_actions << action_message(members, cards, action, board_info)
         end
         return new_actions.compact
       end
@@ -30,7 +32,7 @@ module TrelloNinja
 
       private
 
-        def action_message(members, cards, action)
+        def action_message(members, cards, action, board_info)
           data = action['data']
           if data && data['card']
           	card_id = data['card']['id']
@@ -129,10 +131,16 @@ module TrelloNinja
             # move card from other board
             elsif action["type"] == "moveCardFromBoard"
               message = "#{author_fullname} transferred #{card_name} from #{data["board"]["name"]} to #{data["boardTarget"]["name"]}."
+
+            elsif action["type"] == "convertToCardFromCheckItem"
+              cardSource_object = cards.detect { |card| card['id'] == data['cardSource']['id'] }
+              card_object = cards.detect { |card| card['id'] == data["card"]["id"] }
+              message = "#{author_fullname} converted <a href='#{card_object["url"]}' target='_new'>#{card_object["name"]}</a> from a checklist item on <a href='#{cardSource_object["url"]}' target='_new'>#{cardSource_object["name"]}</a>."
             end
 
             action['link'] = card_url
             action['message'] = message
+            action['board_url'] = board_info['url']
           else
             action = nil
           end
