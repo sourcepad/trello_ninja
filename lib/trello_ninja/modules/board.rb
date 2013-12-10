@@ -24,6 +24,10 @@ module TrelloNinja
         return new_actions.compact
       end
 
+      def get_actions(board_id)
+        actions = JSON(connection["/boards/#{board_id}/actions?key=#{key['client_id']}&token=#{token}"].get)
+      end
+
       private
 
         def action_message(members, cards, action)
@@ -55,6 +59,10 @@ module TrelloNinja
             elsif action["type"] == "updateCard" && data["old"] && data["old"]["name"]
               message = "#{author_fullname} renamed [#{data["old"]["name"]}] to  <a href='#{card_url}' target='_blank'>#{card_name}</a>"
 
+            # update description
+            elsif action["type"] == "updateCard" && data["old"] && data["old"]["desc"]
+              message = "#{author_fullname} updated the description of <a href='#{card_url}' target='_blank'>#{card_name}</a>"  
+
             # archived card
             elsif action["type"] == "updateCard" && data["old"]
               if data["old"]["closed"] == true
@@ -62,14 +70,6 @@ module TrelloNinja
               elsif data["old"]["closed"] == false
                 message = "#{author_fullname} archived #{card_name}"
               end
-
-            # update description
-            elsif action["type"] == "updateCard" && data["old"] && data["old"]["desc"]
-              message = "#{author_fullname} updated the description of <a href='#{card_url}' target='_blank'>#{card_name}</a>"            
-
-            # update position
-            # elsif action["type"] == "updateCard" && data["old"] && data["old"]["pos"]
-            #   message = "none"            
 
             # Comment on card
             elsif action['type'] == "commentCard"
@@ -90,20 +90,47 @@ module TrelloNinja
               else
                 message = "#{author_fullname} removed #{member_fullname} from <a href='#{card_url}' target='_blank'>#{card_name}</a>"
               end
-
-            elsif action["type"] == "addMemberToBoard"
-              begin
-                added_member_object = members.detect { |member| member['id'] == data['idMemberAdded']}
-                message = "#{author_fullname} added #{added_member_object.present? ? added_member_object['fullName'] : 'a member'} to #{data['board']['name']}"
-              rescue
-                binding.pry
+  
+            # Update Board
+            elsif action["type"] == "updateBoard"
+              if data['board'] && data['board']['desc'] && data['old'] && data['old']['desc']
+                message = "#{author_fullname} changed the description #{data["board"]["name"]}"              
               end
 
+            # Add member to a board
+            elsif action["type"] == "addMemberToBoard"
+              added_member_object = members.detect { |member| member['id'] == data['idMemberAdded']}
+              message = "#{author_fullname} added #{added_member_object.present? ? added_member_object['fullName'] : 'a member'} to #{data['board']['name']}."
+
+            # Add Attachment to Card
+            elsif action["type"] == "addAttachmentToCard"
+              message = "#{author_fullname} attached <a href='#{data["attachment"]["url"]}' target='_blank'>#{data["attachment"]["name"]}</a> to <a href='#{card_url}' target='_blank'>#{card_name}</a>."            
+
+            # Remove Attachment to Card
+            elsif action["type"] == "deleteAttachmentFromCard"
+              message = "#{author_fullname} removed <a href='#{data["attachment"]["url"]}' target='_blank'>#{data["attachment"]["name"]}</a> from <a href='#{card_url}' target='_blank'>#{card_name}</a>."            
+
+            # added a checklist to card
+            elsif action["type"] == "addChecklistToCard" && data['checklist'] && data['checklist']['name']
+              message = "#{author_fullname} added #{data['checklist']['name']} checklist to <a href='#{card_url}' target='_blank'>#{card_name}</a>."
+          
             # Complete an item in the checklist of a card
             elsif action["type"] == "updateCheckItemStateOnCard" && data["checkItem"]["state"] == "complete"
-              message = "#{author_fullname} completed #{data["checkItem"]["name"]} on <a href='#{card_url}' target='_blank'>#{card_name}</a>"            
+              message = "#{author_fullname} completed #{data["checkItem"]["name"]} on <a href='#{card_url}' target='_blank'>#{card_name}</a>."            
+
+            # Remove checklist from card
+            elsif action["type"] == "removeChecklistFromCard" && data['checklist'] && data['checklist']['name']
+              message = "#{author_fullname} removed #{data['checklist']['name']} from <a href='#{card_url}' target='_blank'>#{card_name}</a>."
+
+            # move card to other board
+            elsif action["type"] == "moveCardToBoard" && data["boardSource"]["name"] && data["card"]["name"]
+              message = "#{author_fullname} transferred <a href='#{card_url}' target='_blank'>#{card_name}</a> to #{data["boardSource"]["name"]}."
+
+            # move card from other board
+            elsif action["type"] == "moveCardFromBoard"
+              message = "#{author_fullname} transferred #{card_name} from #{data["board"]["name"]} to #{data["boardTarget"]["name"]}."
             end
-            
+
             action['link'] = card_url
             action['message'] = message
           else
