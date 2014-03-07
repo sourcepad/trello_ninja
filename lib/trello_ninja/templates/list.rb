@@ -1,0 +1,1 @@
+module TrelloNinja; class List < OpenStruct; end; end

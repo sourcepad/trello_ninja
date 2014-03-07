@@ -1,0 +1,1 @@
+module TrelloNinja; class Attachment < OpenStruct; end; end

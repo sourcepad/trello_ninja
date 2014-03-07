@@ -1,0 +1,1 @@
+module TrelloNinja; class Membership < OpenStruct; end; end

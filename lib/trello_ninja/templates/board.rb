@@ -1,4 +1,1 @@
-module TrelloNinja
-  class Board < OpenStruct
-  end
-end
+module TrelloNinja; class Board < OpenStruct; end; end

@@ -5,17 +5,16 @@ require 'trello_ninja/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "trello_ninja"
-  spec.version       = TrelloNinja::VERSION
-  spec.authors       = ["Migz Suelto"]
-  spec.email         = ["michaels@sourcepad.com"]
+  spec.version       = TrelloNinja::Version
+  spec.authors       = ["Migz Suelto", "Jedford Seculles"]
+  spec.email         = ["michaels@sourcepad.com", "jeds@sourcepad.com"]
   spec.description   = "Trello API Ruby Wrapper"
-  spec.summary       = "trello api"
-  spec.homepage      = ""
   spec.license       = "MIT"
-
   spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.homepage      = ''
+  spec.summary       = ''
+  spec.date          = '2014-03-05'
+  # spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"

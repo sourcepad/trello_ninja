@@ -4,7 +4,8 @@ module TrelloNinja
   class Client
     include TrelloNinja::Modules::Member
     include TrelloNinja::Modules::Board
-    include TrelloNinja::Modules::Story
+    include TrelloNinja::Modules::Card
+    include TrelloNinja::Modules::Action
 
     attr_accessor :token, :key, :connections
 
@@ -21,7 +22,7 @@ module TrelloNinja
     private
 
       def new_connection
-        @connections[@token] = RestClient::Resource.new("https://api.trello.com#{api_path}")
+        @connections[@token] = RestClient::Resource.new("https://api.trello.com#{api_path}", headers: {params: {key: @key, token: @token}})
       end
 
       def api_path
