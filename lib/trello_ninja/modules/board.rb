@@ -6,4 +6,12 @@ module TrelloNinja; module Modules; module Board
     puts "Error: #{e.message}"
     []
   end
+
+  def get_board(board_id)
+    object = JSON(connection["/boards/#{board_id}"].get)
+    TrelloNinja::Board.new.extend(TrelloNinja::Renderer::Board).from_hash(object)
+  rescue Exception => e
+    puts "Error: #{e.message}"
+    nil
+  end
 end; end; end

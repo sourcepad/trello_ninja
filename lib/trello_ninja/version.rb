@@ -3,7 +3,7 @@ module TrelloNinja
     MAJOR = 0 unless defined? BasecampNinja::MAJOR
     MINOR = 1 unless defined? BasecampNinja::MINOR
     PATCH = 0 unless defined? BasecampNinja::PATCH
-    PRE   = 0 unless defined? BasecampNinja::PRE
+    PRE   = 1 unless defined? BasecampNinja::PRE
 
     class << self
 
